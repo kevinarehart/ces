@@ -196,7 +196,7 @@ class LoginHandler(MainHandler):
             self.render_login_form(error="Invalid username")
         elif hashutils.valid_pw(submitted_username, submitted_password, user.pw_hash):
             self.login_user(user)
-            self.redirect('/blog/newpost')
+            self.redirect('/')
         else:
             self.render_login_form(error="Invalid password")
 
