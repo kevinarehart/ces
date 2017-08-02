@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+  {% for user in users %}
+    <h1>Welcome, {{ user.username }}</h1>
+  {% endfor %}
+
+  <p>Please feel free to enjoy an all-access pass to our exercises and programs!</p>
+
+{% endblock %}

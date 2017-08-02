@@ -20,7 +20,7 @@ class MainHandler(webapp2.RequestHandler):
             The user parameter will be a User object.
         """
 
-        # TODO - filter the query so that only posts by the given user
+        #filter the query so that only posts by the given user
         query = Post.all().filter('author =', user)
         return query.fetch(limit=limit, offset=offset)
 
@@ -58,13 +58,15 @@ class MainHandler(webapp2.RequestHandler):
         uid = self.read_secure_cookie('user_id')
         self.user = uid and User.get_by_id(int(uid))
 
-        #if not self.user and self.request.path in auth_paths:
-        #    self.redirect('/login')
+        if not self.user and self.request.path in auth_paths:
+            self.redirect('/login')
 
 class IndexHandler(MainHandler):
     def get(self):
+        #list all users
+        users = User.all()
         t = jinja_env.get_template("index.html")
-        response = t.render()
+        response = t.render(users = users)
         self.response.write(response)
 
 class CreateAccount(MainHandler):
@@ -161,19 +163,26 @@ class CreateAccount(MainHandler):
 
 class GoldenCircleHandler(MainHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.write('Render Golden Circle Template')
 
 class ProgramsHandler(MainHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.write('Render Program Template')
 
 class DiagnosticsHandler(MainHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.write('Render Diagnostics Template')
 
 class ExercisesHandler(MainHandler):
     def get(self):
-        self.response.write('Hello world!')
+        self.response.write('Render Exercise Template')
+
+class UserIndexHandler(MainHandler):
+    def get(self, username):
+        users = User.all()
+        t = jinja_env.get_template("welcomepage.html")
+        response = t.render(users = users)
+        self.response.write(response)
 
 class LoginHandler(MainHandler):
     def render_login_form(self, error=""):
@@ -205,6 +214,13 @@ class LogoutHandler(MainHandler):
         self.logout_user()
         self.redirect('/')
 
+class LogoutIndexHandler(MainHandler):
+    def get(self, username):
+        users = User.all()
+        t = jinja_env.get_template("logout.html")
+        response = t.render(users = users)
+        self.response.out.write(response)
+
 app = webapp2.WSGIApplication([
     ('/', IndexHandler),
     ('/createaccount', CreateAccount),
@@ -212,6 +228,13 @@ app = webapp2.WSGIApplication([
     ('/programs', ProgramsHandler),
     ('/diagnostics', DiagnosticsHandler),
     ('/exercises', ExercisesHandler),
+    webapp2.Route('/<username:[a-zA-Z0-9_-]{3,20}>', UserIndexHandler),
+    webapp2.Route('/<id:\d+>', LogoutIndexHandler),
     ('/login', LoginHandler),
     ('/logout', LogoutHandler)
 ], debug=True)
+
+# A list of exercises that a user must be logged in to access
+auth_paths = [
+    '/exercises'
+]

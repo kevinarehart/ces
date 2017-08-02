@@ -1,5 +1,9 @@
 {% extends base.html %}
 
-{% block content %}
+  {% for user in users %}
+    <h1>We hope to see you soon, {{ user.username }}.  Thanks for visiting.</h1>
+  {% endfor %}
+
+  <p>Click <a href="/login">here</a> to log back in :)</p>
 
 {% end block %}
